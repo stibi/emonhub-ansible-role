@@ -25,5 +25,6 @@ emonhub_ansible_role:
   emoncms:
     apikey: 6a272ec63787809a59e4f56bfaac4f3b
 
+  emonhub_logfile: /var/log/emonhub.log
 # TODO absolute path to python2, chce to systemd servica
 # TODO Nodes, vylistovat nody

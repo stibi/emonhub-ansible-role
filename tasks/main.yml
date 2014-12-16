@@ -17,8 +17,14 @@
 # TODO ### create "emonhub" user
 #sudo useradd -M -r -G dialout,tty -c "emonHub user" emonhub
 
+- name: Check if emonhub is already installed
+  stat: >
+    path={{ emonhub_ansible_role.emonhub_installation_dir }}
+  register: emonhub_installation_check
+
 - name: Clone emonhub development branch from github
   sudo: yes
+  when: emonhub_installation_check.stat.exists == false
   git: >
     repo=https://github.com/emonhub/emonhub.git
     dest={{ emonhub_ansible_role.emonhub_repo_installation_dir }}
@@ -46,6 +52,14 @@
     group=root
   tags: [service]
 
+- name: Create logfile for emonhub
+  sudo: yes
+  file: >
+    dest={{ emonhub_ansible_role.emonhub_logfile }}
+    owner={{ emonhub_ansible_role.emonhub_user }}
+    group=users
+    state=touch
+
 # veci v default/emonhub jsou pro init skript, tak ja si je nacpu asi jako env veci do systemd servicy
 
 # TODO toto tady neni dobry, neni hezke
@@ -65,7 +79,10 @@
 
 #- name: Enable and start emonhub service
 #  sudo: yes
-#  service:
+#  service: >
 #    name=emonhub.service
 #    enabled=yes
 #    state=started
+
+
+# TODO logrotate
