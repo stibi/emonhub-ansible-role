@@ -1,0 +1,16 @@
+[Unit]
+Description=emonhub service
+
+[Service]
+Environment="EMONHUB_LOG=/var/log/emonhub.log"
+Environment="EMONHUB_CONFIG=/etc/emonhub/emonhub.conf"
+ExecStart=/usr/bin/python2 emonhub.py --logfile $EMONHUB_LOG --config-file $EMONHUB_CONFIG
+WorkingDirectory=/opt/emonhub
+User=root
+Group=root
+Nice=10
+SyslogIdentifier=emonhub
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,29 @@
+---
+emonhub_ansible_role:
+  emonhub_packages:
+    - python2
+    #- TODO tyhle baliky ceknout, nazvy jsou asi blbe
+    #- python2-serial
+    - python2-configobj
+
+  emonhub_user: emonhub
+  emonhub_user_groups:
+    - users
+    - tty
+    #- tty TODO pokud je tam takova grupa a znamena to sahnout si bez suda na /dev/ttyAM0, jakoze asi ne, nebo aspon se to na archu jmenuje jinak
+
+  emonhub_repo_installation_dir: /opt/emonhub_repo
+  emonhub_installation_dir: /opt/emonhub
+  emonhub_config_path: /etc/emonhub
+
+  rfm12pi:
+    group: 210
+    freq: 868
+    baseid: 1
+
+  # TODO pridat url emoncms serveru
+  emoncms:
+    apikey: 6a272ec63787809a59e4f56bfaac4f3b
+
+# TODO absolute path to python2, chce to systemd servica
+# TODO Nodes, vylistovat nody

@@ -1,0 +1,71 @@
+---
+- name: Install packages needed for emonhub
+  sudo: yes
+  pacman: >
+    name={{ item }}
+    state=present
+  with_items: emonhub_ansible_role.emonhub_packages
+
+- name: Create non-priviledged user to run emonhub
+  sudo: yes
+  user: >
+    name="{{ emonhub_ansible_role.emonhub_user }}"
+    createhome=yes
+    append=yes
+    groups="{{ emonhub_ansible_role.emonhub_user_groups | join(',') }}"
+# TODO vyresit sudo, aby si mohl sahnout na /dev/ttyAM0
+# TODO ### create "emonhub" user
+#sudo useradd -M -r -G dialout,tty -c "emonHub user" emonhub
+
+- name: Clone emonhub development branch from github
+  sudo: yes
+  git: >
+    repo=https://github.com/emonhub/emonhub.git
+    dest={{ emonhub_ansible_role.emonhub_repo_installation_dir }}
+    version=development
+
+# TODO fakt tezke tady vymyslet nejake jmeno, chce to popisek, dokumentaci
+# TODO owner/group muze byt? Asi jo, ale stejne by bylo lepsi mit non-priviledged usera
+# TODO nahore uz toho nonroota vyrabim
+# Kazdopadne potrebuje sudo, aby si sahl na /dev/ttyATM0
+- name: Install emonhub from sources with a symlink
+  sudo: yes
+  file: >
+    src={{ emonhub_ansible_role.emonhub_repo_installation_dir }}/src
+    dest={{ emonhub_ansible_role.emonhub_installation_dir }}
+    owner=root
+    group=root
+    state=link
+
+- name: Install systemd service for emonhub
+  sudo: yes
+  template: >
+    src=emonhub.service.j2
+    dest=/usr/lib/systemd/system/emonhub.service
+    owner=root
+    group=root
+  tags: [service]
+
+# veci v default/emonhub jsou pro init skript, tak ja si je nacpu asi jako env veci do systemd servicy
+
+# TODO toto tady neni dobry, neni hezke
+- name: Create directory in /etc for emonhub configuration
+  sudo: yes
+  file: >
+    dest={{ emonhub_ansible_role.emonhub_config_path }}
+    state=directory
+
+- name: Deploy emonhub configuration file
+  sudo: yes
+  template: >
+    src=emonhub.conf.j2
+    dest={{ emonhub_ansible_role.emonhub_config_path }}/emonhub.conf
+    owner=root
+    group=root
+
+#- name: Enable and start emonhub service
+#  sudo: yes
+#  service:
+#    name=emonhub.service
+#    enabled=yes
+#    state=started
