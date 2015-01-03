@@ -53,10 +53,31 @@
 - name: Install systemd service for emonhub
   sudo: yes
   template: >
-    src=emonhub.service.j2
+    src=emonhub.systemd.service.j2
     dest=/usr/lib/systemd/system/emonhub.service
     owner=root
     group=root
+  when: ansible_distribution == "Archlinux"
+  tags: [emonhub, service]
+
+- name: Install config file with defaults for emonhub SysV init script
+  sudo: yes
+  template: >
+    src=emonhub.sysv.defaults.j2
+    dest=/etc/default/emonhub
+    owner=root
+    group=root
+  when: ansible_distribution == "Raspbian"
+  tags: [emonhub, service]
+
+- name: Install SysV service for emonhub
+  sudo: yes
+  template: >
+    src=emonhub.sysv.service.j2
+    dest=/etc/init.d/emonhub
+    owner=root
+    group=root
+  when: ansible_distribution == "Raspbian"
   tags: [emonhub, service]
 
 # the ansible file module not used here to create the logfile
@@ -102,5 +123,3 @@
     enabled=yes
     state=started
   tags: [emonhub]
-
-# TODO logrotate
