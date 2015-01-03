@@ -1,0 +1,12 @@
+---
+
+emonhub_ansible_role_distro_vars:
+  # TODO check the package names and if the list is complete
+  emonhub_packages:
+    - python
+    - python-serial
+    - python-configobj
+  emonhub_user_groups:
+    - users
+    - dialout
+    - tty

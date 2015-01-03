@@ -1,10 +1,16 @@
 ---
+
+- include_vars: "{{ ansible_distribution }}.yml"
+  tags: [emonhub]
+
 - name: Install packages needed for emonhub
   sudo: yes
-  pacman: >
+  action: >
+    {{ ansible_pkg_mgr }}
     name={{ item }}
     state=present
-  with_items: emonhub_ansible_role.emonhub_packages
+  with_items: emonhub_ansible_role_distro_vars.emonhub_packages
+  tags: [emonhub]
 
 - name: Create non-priviledged user to run emonhub
   sudo: yes
@@ -12,15 +18,14 @@
     name="{{ emonhub_ansible_role.emonhub_user }}"
     createhome=yes
     append=yes
-    groups="{{ emonhub_ansible_role.emonhub_user_groups | join(',') }}"
-# TODO vyresit sudo, aby si mohl sahnout na /dev/ttyAM0
-# TODO ### create "emonhub" user
-#sudo useradd -M -r -G dialout,tty -c "emonHub user" emonhub
+    groups="{{ emonhub_ansible_role_distro_vars.emonhub_user_groups | join(',') }}"
+  tags: [emonhub]
 
 - name: Check if emonhub is already installed
   stat: >
     path={{ emonhub_ansible_role.emonhub_installation_dir }}
   register: emonhub_installation_check
+  tags: [emonhub]
 
 - name: Clone emonhub development branch from github
   sudo: yes
@@ -28,7 +33,8 @@
   git: >
     repo=https://github.com/emonhub/emonhub.git
     dest={{ emonhub_ansible_role.emonhub_repo_installation_dir }}
-    version=development
+    version={{ emonhub_branch | default(development) }}
+  tags: [emonhub]
 
 # TODO fakt tezke tady vymyslet nejake jmeno, chce to popisek, dokumentaci
 # TODO owner/group muze byt? Asi jo, ale stejne by bylo lepsi mit non-priviledged usera
@@ -42,6 +48,7 @@
     owner=root
     group=root
     state=link
+  tags: [emonhub]
 
 - name: Install systemd service for emonhub
   sudo: yes
@@ -50,7 +57,7 @@
     dest=/usr/lib/systemd/system/emonhub.service
     owner=root
     group=root
-  tags: [service]
+  tags: [emonhub, service]
 
 - name: Create logfile for emonhub
   sudo: yes
@@ -59,8 +66,7 @@
     owner={{ emonhub_ansible_role.emonhub_user }}
     group=users
     state=touch
-
-# veci v default/emonhub jsou pro init skript, tak ja si je nacpu asi jako env veci do systemd servicy
+  tags: [emonhub]
 
 # TODO toto tady neni dobry, neni hezke
 - name: Create directory in /etc for emonhub configuration
@@ -68,6 +74,7 @@
   file: >
     dest={{ emonhub_ansible_role.emonhub_config_path }}
     state=directory
+  tags: [emonhub]
 
 - name: Deploy emonhub configuration file
   sudo: yes
@@ -76,13 +83,14 @@
     dest={{ emonhub_ansible_role.emonhub_config_path }}/emonhub.conf
     owner=root
     group=root
+  tags: [emonhub]
 
-#- name: Enable and start emonhub service
-#  sudo: yes
-#  service: >
-#    name=emonhub.service
-#    enabled=yes
-#    state=started
-
+- name: Enable and start emonhub service
+  sudo: yes
+  service: >
+    name=emonhub.service
+    enabled=yes
+    state=started
+  tags: [emonhub]
 
 # TODO logrotate

@@ -34,8 +34,8 @@ loglevel = WARNING
     Type = EmonHubEmoncmsReporter
     [[[init_settings]]]
     [[[runtimesettings]]]
-        url = http://localhost/emoncms
-        apikey = {{ emonhub_ansible_role.emoncms.apikey }}
+        url = {{ emonhub_emoncms_url | default("http://localhost/emoncms") }}
+        apikey = {{ emonhub_emoncms_apikey }}
 
 
 #######################################################################
@@ -47,12 +47,12 @@ loglevel = WARNING
 [[RFM2Pi]]
     Type = EmonHubJeeInterfacer
     [[[init_settings]]]
-        com_port = /dev/ttyAMA0
-        com_baud = 9600
+        com_port = {{ rfm12pi_comport | default("/dev/ttyAMA0") }}
+        com_baud = {{ rfm12pi_baud | default(9600) }}
     [[[runtimesettings]]]
-        group = {{ emonhub_ansible_role.rfm12pi.group }}
-        frequency = {{ emonhub_ansible_role.rfm12pi.freq }}
-        baseid = {{ emonhub_ansible_role.rfm12pi.baseid }}
+        group = {{ rfm12pi_group | default(210) }}
+        frequency = {{ rfm12pi_freq | default(868) }}
+        baseid = {{ fm12pi_baseid | default(1) }}
 
 
 #######################################################################
