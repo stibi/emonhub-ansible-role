@@ -59,13 +59,23 @@
     group=root
   tags: [emonhub, service]
 
+# the ansible file module not used here to create the logfile
+# because with state=file for the file module, the status of the action would
+# be "changed" for every run, see doc why
+# Thanks to "creates" arg,the logfile is really created only when doesn't exist
 - name: Create logfile for emonhub
+  command: touch {{ emonhub_ansible_role.emonhub_logfile }}
+  args:
+    creates: "{{ emonhub_ansible_role.emonhub_logfile }}"
+  tags: [emonhub]
+
+- name: Setup emonhub logfile permissions
   sudo: yes
   file: >
     dest={{ emonhub_ansible_role.emonhub_logfile }}
     owner={{ emonhub_ansible_role.emonhub_user }}
     group=users
-    state=touch
+    state=file
   tags: [emonhub]
 
 # TODO toto tady neni dobry, neni hezke
