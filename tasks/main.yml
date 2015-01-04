@@ -36,17 +36,27 @@
     version={{ emonhub_branch | default(development) }}
   tags: [emonhub]
 
-# TODO fakt tezke tady vymyslet nejake jmeno, chce to popisek, dokumentaci
-# TODO owner/group muze byt? Asi jo, ale stejne by bylo lepsi mit non-priviledged usera
-# TODO nahore uz toho nonroota vyrabim
-# Kazdopadne potrebuje sudo, aby si sahl na /dev/ttyATM0
-- name: Install emonhub from sources with a symlink
+- name: Setup permissions of the cloned emonHub repository
+  sudo: yes
+  file: >
+    dest={{ emonhub_ansible_role.emonhub_repo_installation_dir }}
+    owner={{ emonhub_ansible_role.emonhub_user }}
+    group={{ emonhub_ansible_role.users_group }}
+    recurse=yes
+    state=directory
+  tags: [emonhub]
+
+# In the emonhub git repository cloned to the host in the previous step,
+# there is a "src/" directory with all emonhub sources.
+# The directory is symlinked to a configured location which becomes the
+# emonhub installation.
+- name: Install emonhub from the git repo with a symlink
   sudo: yes
   file: >
     src={{ emonhub_ansible_role.emonhub_repo_installation_dir }}/src
     dest={{ emonhub_ansible_role.emonhub_installation_dir }}
-    owner=root
-    group=root
+    owner={{ emonhub_ansible_role.emonhub_user }}
+    group={{ emonhub_ansible_role.users_group }}
     state=link
   tags: [emonhub]
 
@@ -95,7 +105,7 @@
   file: >
     dest={{ emonhub_ansible_role.emonhub_logfile }}
     owner={{ emonhub_ansible_role.emonhub_user }}
-    group=users
+    group={{ emonhub_ansible_role.users_group }}
     state=file
   tags: [emonhub]
 
@@ -112,8 +122,8 @@
   template: >
     src=emonhub.conf.j2
     dest={{ emonhub_ansible_role.emonhub_config_path }}/emonhub.conf
-    owner=root
-    group=root
+    owner={{ emonhub_ansible_role.emonhub_user }}
+    group={{ emonhub_ansible_role.users_group }}
   tags: [emonhub]
 
 - name: Enable and start emonhub service
