@@ -109,7 +109,6 @@
     state=file
   tags: [emonhub]
 
-# TODO toto tady neni dobry, neni hezke
 - name: Create directory in /etc for emonhub configuration
   sudo: yes
   file: >
