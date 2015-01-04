@@ -16,26 +16,16 @@ You know, pull requests are welcome…
 
 ### Distro specific variables 
 
-Some distro specific variable are imported for a play on runtime.
-The property names are quite self describing I think, so for example the `vars/Archlinux.yml`:
+Some distro specific variable are imported for the role at runtime.
+The property names are quite self describing I think, you can find a YAML file for each supported distro in `vars/`, for example `vars/Archlinux.yml`:
 
-```
-emonhub_ansible_role_distro_vars:
-  emonhub_packages:
-    - python2
-    - python2-pyserial
-    - python2-configobj
-  emonhub_user_groups:
-    - users
-    - uucp
-```
+`emonhub_packages` : this is a list of package names, dependencies for emonHub
 
-`emonhub_packages` : this is a list emonhub dependencies, needed to be installed by package manager on the system
-`emonhub_user_groups` : a list of groups, to which a non-priviledged user is assigned, under this user is emonhub running
+`emonhub_user_groups` : this is a list of system groups, non-privilidged user created to run emonhub is assigned to these groups
 
-### Role variables
+### Role parametres
 
-The you can setup few role variables, see the usage in examples.
+You can parametrize the role, see the example playbook below, how to use it.
 
 `rfm12pi_group` : the network group for RFM12B modules communication 
 (if not specified, the default is `210`) 
@@ -49,25 +39,26 @@ The you can setup few role variables, see the usage in examples.
 `emonhub_emoncms_apikey` : the apikey for communication with EmonCMS
 (no default value, must be specified)
 
-### Other vars
+### Other vars in vars/main.yml
 
-Finally, a handfull of the usual variables in `vars/main.yml`:
 
 `emonhub_user` : name of the non-priviledged user used to run emonhub
-`users_group` : name of system group for users
-`emonhub_repo_installation_dir` : path to where is the emonhub repository cloned in the system
-`emonhub_installation_dir` : path where is the emonhub actually installed
-`emonhub_config_path` : path to where is the emonhub config file stored
-`emonhub_logfile` : path to emonhub logfile
-`python_exec_path` : path yo python2 executable, needed for emonhub systemd server, will be moved to Archlinux specific variable file (TODO)
 
-Dependencies
-------------
+`users_group` : name of system group for users
+
+`emonhub_repo_installation_dir` : path to where is the emonhub repository cloned in the system
+
+`emonhub_installation_dir` : path where is the emonhub actually installed
+
+`emonhub_config_path` : path to where is the emonhub config file stored
+
+`emonhub_logfile` : path to emonhub logfile
+
+## Dependencies
 
 Nope, nothing.
 
-Example Playbook
-----------------
+## Example Playbook
 
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
@@ -78,13 +69,11 @@ Including an example of how to use your role (for instance, with variables passe
     - { role: emonhub-ansible-role, rfm12pi_group: 210, rfm12pi_freq: 868,rfm12pi_baseid: 1, emonhub_emoncms_apikey: "6a345ec65137009a59e4f56bfabb4f3e" }
 ```
 
-License
--------
+## License
 
 BSD
 
-Author Information
-------------------
+## Author Information
 
 Martin Stiborský (CZ)
 Twitter: http://twitter.com/stibi

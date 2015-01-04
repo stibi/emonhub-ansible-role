@@ -9,3 +9,4 @@ emonhub_ansible_role_distro_vars:
   emonhub_user_groups:
     - users
     - uucp
+  python_exec_path: /usr/bin/python2
